@@ -6,8 +6,11 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="form-field">
-        {{ form.as_p }}
-      </div>
+    <form method="post" action="" >
+        {%csrf_token%}
+        {{form.as_p}}
+        <a href="{%url 'BL'%}">Retour</a>
+        <input type="submit", value="Ajout">
+    </form>
 </body>
 </html>

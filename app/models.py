@@ -1,7 +1,6 @@
 from django.db import models
 from datetime import datetime
-
-
+from django.core.validators import MinValueValidator
 
 class TypeProduit(models.Model):
     nom_t = models.CharField(max_length=100)
@@ -54,6 +53,17 @@ class Produit_BonDeCmd (models.Model):
     bon = models.ForeignKey(BonDeCmd, on_delete=models.CASCADE)
     produit = models.ManyToManyField(Produit)
     quantite = models.PositiveIntegerField()
+class Entete(models.Model):
+    numero_ent = models.IntegerField()
+    date_ent = models.DateField()
+    fournisseur_ent = models.ForeignKey(Fournisseur, on_delete=models.CASCADE)
+class Facture(models.Model):
+    entete = models.ForeignKey(Entete, on_delete=models.CASCADE)
+    quantite = models.PositiveIntegerField()
+    produit_BL = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    prix_HT = models.DecimalField(max_digits=10, decimal_places=2)
+    prix_vd = models.DecimalField(max_digits=10, decimal_places=2)
+
 
 
 

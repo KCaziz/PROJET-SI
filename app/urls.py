@@ -25,6 +25,12 @@ urlpatterns = [
     path("Bon De Commande/Ajout_BonDeCmd", views.ajouter_bon_de_commande, name="Ajout_BonDeCmd"),
     path("Bon De Commande/Ajout_BonDeCmd/<int:pk>/supprime_Bon_De_Commande", views.supprime_bon, name="supprime_bon"),
     path("Bon De Commande/Ajout_BonDeCmd/<int:pk>/details_Bon_De_Commande", views.details_bon, name="details_bon"),
-    path('bon-de-commande/add-ligne/', views.new_form_field, name='new_form_field'),
-
+    path('search/', views.search, name='search'),
+    path("BL/", views.BL, name='BL'),
+    path("BL/<int:pk>/Supprime_Facture", views.supprime_facture, name='supprime_facture'),
+    path("BL/<int:pk>/Modifie_Facture", views.modifier_facture, name='modifier_facture'),
+    path("BL/Recherche_Facture", views.rechercher_facture, name='recherche_facture'),
+    path("BL/<int:pk>/Details_Facture", views.details_BL, name='details_BL'),
+    path("BL/Ajout_Entete/", views.entete, name='Entete'),
+    path("BL/Ajout_Entete/<int:pk>/Ajout_Facture/", views.facture, name='Ajout_Facture'),
 ]

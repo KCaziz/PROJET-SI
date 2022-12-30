@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    {%load static%}
+  <head>
+    <title>Page des Fournisseurs</title>
+    <link rel="stylesheet" href="{%static 'produit.css'%}">
+  </head>
+  <body>
+    <h1>Liste des Fournisseurs</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Numero</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for BL in BLs %}
+        <tr>
+          <td>{{ BL.numero_ent }}</td>
+          <td>{{ BL.date_ent}}</td>
+          <td>
+            <a href="{%url 'details_BL' BL.id%}">details</a>
+            <a href="{% url 'modifier_facture' BL.id%}">Modifier</a>
+            <a href="{%url 'supprime_facture' BL.id%}">Supprimer</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{%url 'Entete' %}">Ajouter une entete</a>
+    <a href="{%url 'recherche_facture' %}">Rechercher</a>
+    <button onclick="window.print()">Imprimer la liste</button>
+  </body>
+</html>

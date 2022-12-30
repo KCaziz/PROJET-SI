@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
-from .models import Produit, TypeProduit, BonDeCmd, Fournisseur, Produit_BonDeCmd
-from .forms import ProduitForm, TypeForm, BonForm, LigneBonDeCommandeFormSet, LigneBonDeCommandeForm, FournisseurForm
+from .models import Produit, TypeProduit, BonDeCmd, Fournisseur, Produit_BonDeCmd, Entete, Facture
+from .forms import ProduitForm, TypeForm, BonForm, LigneBonDeCommandeFormSet, LigneBonDeCommandeForm, FournisseurForm, EnteteForm, FactureForm
+from django.http import JsonResponse
+
 
 # Create your views here.
 def acceuil(request):
@@ -159,6 +161,7 @@ def rechercher_fournisseur (request):
 
 
 
+
 def Entree(request):
     return render(request, "Entree.html")
 def affiche_BonDeCmd(request):
@@ -182,19 +185,38 @@ def ajouter_bon_de_commande(request):
         'form': form,
         'formset': formset,
     })
-# def ajouter_bon_de_commande(request):
-#     if request.method == 'POST':
-#         form = BonForm(request.POST)
-#         formset = LigneBonDeCommandeFormSet(request.POST, prefix='lignes')
-#         if form.is_valid() and formset.is_valid():
-#             bon_de_commande = form.save()
-#             formset.instance = bon_de_commande
-#             formset.save()
-#             return redirect('BonDeCmd')
-#     else:
-#         form = BonForm()
-#         formset = LigneBonDeCommandeFormSet(prefix='lignes')
-#     return render(request, 'Ajout_BonDeCmd.html', {'form': form, 'formset': formset})
+
+
+
+
+
+def Ajouter_Bon_De_Commande(request):
+    if request.method == 'POST':
+        form = BonForm(request.POST)
+        if form.is_valid():
+            form.save()
+            redirect('BonDeCmd')
+    else:
+        form = BonForm()
+        return render(request, 'Ajout_BonDeCmd.html', {'form':form})
+def Ajouter_Produit_Bon_De_Commande(request, bon):
+    if request.method == 'POST':
+        form = LigneBonDeCommandeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            redirect('BonDeCmd')
+    else:
+        form = LigneBonDeCommandeForm(initial={
+            'bon': bon
+        })
+        return render(request, 'Ajout_Produit_BonDeCmd.html', {'form':form})
+
+def new_form_field(request):
+  if request.is_ajax():
+        form = LigneBonDeCommandeForm()
+        return render(request, 'new_form_field.html', {'form': form})
+  else:
+    return render(request, "acceuil.html")
 # def ajouter_bon_de_commande(request):
 #     if request.method == 'POST':
 #         form = BonForm(request.POST)
@@ -211,18 +233,87 @@ def ajouter_bon_de_commande(request):
 #     return render(request, 'Ajout_BonDeCmd.html', {'form': form, 'formset': formset})
 
 
-def new_form_field(request):
-  if request.is_ajax():
-    form = LigneBonDeCommandeForm()
-    return render(request, 'new_form_field.html', {'form': form})
-  else:
-    return render(request, "acceuil.html")
+
 
 
 def details_bon(request,pk):
-    produit_bon = Produit_BonDeCmd.objects.filter(id__contains=pk)
+    produit_bon = Produit_BonDeCmd.objects.filter(bon__id=pk)
     return render(request, "details_bon.html", {"produit_bon": produit_bon })
 def supprime_bon(request, pk):
     bon = BonDeCmd.objects.get(id=pk)
     bon.delete()
     return redirect('BonDeCmd')
+
+
+
+
+def search(request):
+  if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+    query = request.GET.get('q', '')
+    results = Produit.objects.filter(nom_p__icontains=query)
+    data = []
+    for result in results:
+      data.append({ 'qte': result.quantite, 'nom_p': result.nom_p })
+    return JsonResponse({ 'data': data })
+  else:
+    return render(request, 'search.html')
+
+
+def BL(request):
+    bl = Entete.objects.all()
+    return render(request, "BL.html", {"BLs":bl})
+def entete(request):
+    if request.method == 'POST':
+        form = EnteteForm(request.POST)
+        if form.is_valid():
+            entete = form.save()
+            return redirect('Ajout_Facture', pk=entete.id)
+    else:
+        form = EnteteForm()
+        return render(request, "Entete.html", {"form":form})
+def facture(request, pk):
+    entete = Entete.objects.get(id=pk)
+    if request.method == 'POST':
+        form = FactureForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('Ajout_Facture', pk=entete.id)
+    else:
+        form = FactureForm(initial={
+            'entete':entete,
+            })
+        return render(request, "Ajoute_Facture.html", {"form":form}) 
+def supprime_facture(request, pk):
+    bon = Entete.objects.get(id=pk)
+    bon.delete()
+    return redirect('BL')
+def modifier_facture(request, pk):
+    entete = Entete.objects.get(id=pk)
+    if request.method == 'POST':
+        form = EnteteForm(request.POST, instance=entete)
+        if form.is_valid():
+            form.save()
+            return redirect('BL')
+    else:
+        form = EnteteForm(initial={
+            'numero_ent' : entete.numero_ent,
+            'date_ent'  : entete.date_ent,
+            'fournisseur_ent': entete.fournisseur_ent,
+        })
+    return render(request, 'modifier_type.html', {'form': form})
+def rechercher_facture (request):
+    entete =""
+    if (request.method =="GET"):
+        query=request.GET.get('recherche')
+        if query:
+            entete=Entete.objects.filter(numero_ent__contains = query)
+        return render(request, "search_BL.html",{"entetes": entete})
+def details_BL(request,pk):
+    total_HT = 0
+    total_TTC = 0
+    BL = Facture.objects.filter(entete__id=pk)
+    entete = Entete.objects.get(id=pk)
+    for ligne in BL:
+        total_HT = total_HT +ligne.prix_HT * ligne.quantite
+        total_TTC = total_TTC +ligne.prix_vd * ligne.quantite
+    return render(request, "details_BL.html", {"BL": BL , "entete":entete, "total_HT":total_HT, "total_TTC":total_TTC})

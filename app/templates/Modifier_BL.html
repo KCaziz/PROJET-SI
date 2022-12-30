@@ -1,0 +1,19 @@
+<html lang="en">
+    {%load static%}
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modification BL</title>
+    <link rel="stylesheet" href="{% static 'modifier_produit.css' %}">
+  </head>
+  <body>
+    <h1>Modification BL</h1>
+    <form method="post" action="" class="modifier-produit">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <a href="{% url 'BL'%}">Retour</a>
+      <input type="submit" value="Modifier">
+    </form>
+  </body>
+</html>

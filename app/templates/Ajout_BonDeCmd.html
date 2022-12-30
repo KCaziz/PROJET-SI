@@ -12,26 +12,22 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        {{ formset.management_form }}
-        {% for form in formset %}
-          {{ form.as_p}}
-        {% endfor %}
-        <button id="add-field-button">Ajouter un produit</button>
         <input type="submit" value="Enregistrer">
       </form>
+    <a href="{%url 'Ajout_Produit_Bon_De_Commande'"></a>
     <a href="{%url 'BonDeCmd'%}">Retour</a>
 </body>
 </html>
 <script>document.getElementById('add-field-button').addEventListener('click', function() {
    
   // Envoyer une requête AJAX au serveur pour récupérer un nouveau champ de formulaire
-  fetch("{%url 'new_form_field'")
+  fetch("{%url 'new_form_field'%}")
     .then(function(response) {
       return response.text();
     })
     .then(function(html) {
       // Ajouter le nouveau champ de formulaire à la page
-      document.getElementById('form-fields').innerHTML += html;
+      document.getElementById('form-field').innerHTML += html;
     });
 });
 </script>
